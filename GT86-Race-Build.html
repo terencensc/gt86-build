@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GT86 Race Build — Terence & Wayne</title>
+<style>
+:root {
+  --primary: #e63946;
+  --primary-dark: #b52d38;
+  --accent: #1d3557;
+  --accent-light: #457b9d;
+  --bg: #0d1117;
+  --card: #161b22;
+  --card-hover: #1c2230;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --success: #2ea043;
+  --warning: #d29922;
+  --info: #58a6ff;
+  --gold: #ffd700;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.hero {
+  background: linear-gradient(135deg, var(--accent) 0%, #0d1117 50%, var(--primary-dark) 100%);
+  padding: 2rem 1rem;
+  text-align: center;
+  border-bottom: 3px solid var(--primary);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.02) 40px, rgba(255,255,255,0.02) 41px);
+}
+.hero h1 {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  position: relative;
+}
+.hero h1 span { color: var(--primary); }
+.hero .subtitle {
+  color: var(--text-dim);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  position: relative;
+}
+.workshop-banner {
+  background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+  color: white;
+  padding: 0.8rem 1rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+}
+.workshop-banner a { color: var(--gold); text-decoration: none; }
+.workshop-banner small { display: block; font-weight: 400; opacity: 0.9; font-size: 0.8rem; margin-top: 2px; }
+nav {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0.5rem;
+  display: flex;
+  gap: 0.3rem;
+  overflow-x: auto;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  -webkit-overflow-scrolling: touch;
+}
+nav button {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+nav button:hover { border-color: var(--accent-light); color: var(--text); }
+nav button.active { background: var(--primary); color: white; border-color: var(--primary); }
+.container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+.section { display: none; }
+.section.active { display: block; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: var(--accent-light); }
+.card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.badge-best { background: var(--success); color: white; }
+.badge-good { background: var(--info); color: white; }
+.badge-warn { background: var(--warning); color: #000; }
+.badge-no { background: #f85149; color: white; }
+.badge-done { background: var(--success); color: white; }
+.badge-todo { background: var(--border); color: var(--text-dim); }
+.badge-inprog { background: var(--warning); color: #000; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+th, td {
+  padding: 0.5rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; }
+tr:hover td { background: rgba(255,255,255,0.03); }
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+.checklist-item:last-child { border-bottom: none; }
+.checklist-item input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.checklist-item.checked .item-text { text-decoration: line-through; color: var(--text-dim); }
+.item-text { flex: 1; }
+.item-text .item-title { font-weight: 600; font-size: 0.9rem; }
+.item-text .item-detail { color: var(--text-dim); font-size: 0.8rem; margin-top: 2px; }
+.item-text .item-ref { color: var(--info); font-size: 0.75rem; font-style: italic; }
+.item-price { color: var(--gold); font-weight: 700; font-size: 0.9rem; white-space: nowrap; }
+a { color: var(--info); }
+a:hover { text-decoration: underline; }
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+}
+.stat-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8rem;
+  text-align: center;
+}
+.stat-box .stat-num { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+.stat-box .stat-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.collapsible-header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.collapsible-header::after {
+  content: '+';
+  font-size: 1.2rem;
+  color: var(--text-dim);
+  transition: transform 0.2s;
+}
+.collapsible-header.open::after { content: '−'; }
+.collapsible-body { display: none; margin-top: 0.8rem; }
+.collapsible-body.open { display: block; }
+.timeline-item {
+  position: relative;
+  padding-left: 2rem;
+  padding-bottom: 1.5rem;
+  border-left: 2px solid var(--border);
+  margin-left: 0.5rem;
+}
+.timeline-item:last-child { border-left-color: transparent; }
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 2px solid var(--bg);
+}
+.timeline-item.done::before { background: var(--success); }
+.timeline-item.current::before { background: var(--warning); box-shadow: 0 0 8px var(--warning); }
+.timeline-item.future::before { background: var(--border); }
+.timeline-item .tl-date { font-size: 0.75rem; color: var(--text-dim); }
+.timeline-item .tl-title { font-weight: 600; font-size: 0.95rem; }
+.timeline-item .tl-desc { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
+.spec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+.spec-grid dt { color: var(--text-dim); }
+.spec-grid dd { font-weight: 600; text-align: right; }
+.note-box {
+  background: rgba(88, 166, 255, 0.08);
+  border: 1px solid rgba(88, 166, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-size: 0.85rem;
+  margin: 0.8rem 0;
+}
+.note-box.warn {
+  background: rgba(210, 153, 34, 0.08);
+  border-color: rgba(210, 153, 34, 0.3);
+}
+.note-box.success {
+  background: rgba(46, 160, 67, 0.08);
+  border-color: rgba(46, 160, 67, 0.3);
+}
+.total-bar {
+  background: var(--card);
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+.total-bar .amount { color: var(--gold); font-size: 1.6rem; }
+footer {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+@media (max-width: 600px) {
+  .spec-grid { grid-template-columns: 1fr 1fr; gap: 0.2rem; font-size: 0.8rem; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  table { font-size: 0.75rem; }
+  th, td { padding: 0.4rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>TOYOTA <span>GT86</span> RACE BUILD</h1>
+  <div class="subtitle">Terence & Wayne — Race-Ready Build Manual & Project Tracker</div>
+</div>
+
+<div class="workshop-banner">
+  Built by <a href="https://maps.google.com/?q=Factory+3/7+Elliot+Place+Ringwood+VIC+3134">RINGWOOD SERVICE CENTRE</a>
+  <small>Factory 3/7 Elliot Place, Ringwood VIC 3134</small>
+</div>
+
+<nav id="mainNav">
+  <button class="active" onclick="showTab('overview')">Overview</button>
+  <button onclick="showTab('races')">Race Series</button>
+  <button onclick="showTab('build')">Build Checklist</button>
+  <button onclick="showTab('parts')">Parts List</button>
+  <button onclick="showTab('rules')">Rules Quick-Ref</button>
+  <button onclick="showTab('licence')">Licences</button>
+  <button onclick="showTab('specs')">Car Specs</button>
+  <button onclick="showTab('timeline')">Timeline</button>
+</nav>
+
+<div class="container">
+
+<!-- ============ OVERVIEW ============ -->
+<div id="overview" class="section active">
+  <h2 style="margin:1rem 0 0.8rem;">Project Dashboard</h2>
+  <div class="stat-grid">
+    <div class="stat-box">
+      <div class="stat-num" id="completedCount">2</div>
+      <div class="stat-label">Tasks Done</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="totalCount">28</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="spentAmount">$0</div>
+      <div class="stat-label">Spent So Far</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num" id="budgetAmount">$15.8K</div>
+      <div class="stat-label">Est. Parts Budget</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Build Progress</h3>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:7%;background:linear-gradient(90deg,var(--primary),var(--warning))"></div></div>
+    <span style="font-size:0.8rem;color:var(--text-dim)" id="progressLabel">2 of 28 tasks complete (7%)</span>
+  </div>
+
+  <div class="card">
+    <h3>The Mission</h3>
+    <p style="font-size:0.9rem;color:var(--text-dim)">Build a Group 3E-compliant Toyota GT86 for Australian endurance racing. The goal: maximum track time at minimum cost, learn to drive fast, have fun, and get Ringwood Service Centre some exposure while we're at it. We're not here to win — we're here to race.</p>
+  </div>
+
+  <div class="card">
+    <h3>Recommended Path <span class="badge badge-best">Best Fit</span></h3>
+    <p style="font-size:0.9rem;"><strong>Australian Production Cars (APC) Enduro Championship</strong> — 2-3 hour endurance races, Group 3E technical rules, up to 3 drivers per car, team branding allowed. The GT86 slots into <strong>Class D (Production Cars)</strong> with a minimum weight of 1179-1218kg depending on variant. Runs under AASA at circuits across Australia.</p>
+    <div class="note-box success">This is your primary target series. Endurance format gives the most seat time per dollar, and you can advertise Ringwood Service Centre on the car.</div>
+  </div>
+
+  <div class="card">
+    <h3>Already Completed</h3>
+    <div class="checklist-item checked">
+      <input type="checkbox" checked disabled>
+      <div class="item-text">
+        <div class="item-title">Secondhand engine swap</div>
+        <div class="item-detail">Replacement engine fitted due to rod bearing issue on auction car</div>
+      </div>
+    </div>
+    <div class="checklist-item checked">
+      <input type="checkbox" checked disabled>
+      <div class="item-text">
+        <div class="item-title">Drivetrain upgrades installed</div>
+        <div class="item-detail">Xtreme chromoly flywheel (FSU103c), Xtreme HD clutch kit (KSU23012-1A), Verus forged clutch fork + billet pivot ball, throwout bearing (30502AA150)</div>
+        <div class="item-ref">Group 3E Ref: Art. 4 — flywheel must be ferrous material; clutch free provided same number of driven plates and diaphragm spring type maintained</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ RACE SERIES ============ -->
+<div id="races" class="section">
+  <h2 style="margin:1rem 0 0.8rem;">Race Series Comparison</h2>
+
+  <div class="card">
+    <h3>Australian Production Cars (APC) <span class="badge badge-best">Best Fit</span></h3>
+    <table>
+      <tr><th style="width:35%">Detail</th><th>Info</th></tr>
+      <tr><td>Format</td><td><strong>Endurance</strong> — 2-3hr races + 2x30min sprints per round (2025); 3hr enduro format for 2026</td></tr>
+      <tr><td>Governing Body</td><td>AASA (2025) / transitioning to ARDC+Motorsport Australia (2026)</td></tr>
+      <tr><td>GT86 Class</td><td><strong>Class D — Production Cars</strong> (86 GT: 1179kg / 86 GTS: 1198kg / GR86: 1246kg)</td></tr>
+      <tr><td>Technical Rules</td><td>Group 3E Series Production Cars</td></tr>
+      <tr><td>Drivers per Car</td><td>Up to 3 drivers</td></tr>
+      <tr><td>Licence Required</td><td>AASA National Racing Licence (~$570/yr) + Vehicle Passport</td></tr>
+      <tr><td>Entry Fee (est.)</td><td>~$1,500-2,500/round (reduced fees under AASA; confirm with APC directly)</td></tr>
+      <tr><td>2025 Circuits</td><td>SMP, QLD Raceway, Mallala, Winton (4-5 rounds)</td></tr>
+      <tr><td>Seat Time/Round</td><td>~3-4 hours (qualifying + 2hr enduro + sprints)</td></tr>
+      <tr><td>Team Branding</td><td>Allowed (series sponsor areas reserved; rest of car is yours)</td></tr>
+      <tr><td>Compulsory Pit Stop</td><td>Yes — min 5 min in races >1hr</td></tr>
+      <tr><td>Mandatory Equipment</td><td>Plumbed-in fire extinguisher, roll cage, harnesses, judicial camera (HD 1080p), overhead refuelling rig</td></tr>
+    </table>
+    <div class="note-box success">Best value for seat time. Endurance format means 2-3 hours of racing per event. Class D will pit you against BRZs, Integras, Mazda RX-8s, Nissan Pulsars — competitive and fun.</div>
+  </div>
+
+  <div class="card">
+    <h3>TGRA Scholarship Series <span class="badge badge-good">Option</span></h3>
+    <table>
+      <tr><th style="width:35%">Detail</th><th>Info</th></tr>
+      <tr><td>Format</td><td><strong>Sprint</strong> — 3x 20-minute races per round (5 rounds)</td></tr>
+      <tr><td>Governing Body</td><td>Motorsport Australia</td></tr>
+      <tr><td>Eligible Cars</td><td>ZN6 Toyota 86 only (old model, AK/BK/CK/DK variants)</td></tr>
+      <tr><td>Technical Rules</td><td>Heavily restricted control components — MoTeC M150 ECU (CM-owned), specific Dunlop tyres, Mobil 1 oil</td></tr>
+      <tr><td>Drivers per Car</td><td>1 driver per car</td></tr>
+      <tr><td>Licence Required</td><td>Motorsport Australia Circuit Licence (~$556/yr)</td></tr>
+      <tr><td>Entry Fee</td><td>~$1,500/round (~$5,000/weekend all-up)</td></tr>
+      <tr><td>Seat Time/Round</td><td>~1 hour (qualifying + 3x 20min races)</td></tr>
+      <tr><td>Team Branding</td><td><strong>PROHIBITED</strong> — only Toyota-approved signage allowed</td></tr>
+      <tr><td>Min Car Weight</td><td>1195kg; Min driver weight 85kg (ballast added if under)</td></tr>
+    </table>
+    <div class="note-box warn">Only 1 driver per car (Terence OR Wayne per round, not both). No workshop advertising. Very restrictive mods — control ECU, control tyres, specific oil. Sprint format = less seat time. However, great for learning racecraft in equal machinery.</div>
+  </div>
+
+  <div class="card">
+    <h3>Bathurst 6 Hour <span class="badge badge-no">Over Budget</span></h3>
+    <table>
+      <tr><th style="width:35%">Detail</th><th>Info</th></tr>
+      <tr><td>Format</td><td><strong>6-hour endurance</strong> at Mount Panorama</td></tr>
+      <tr><td>Governing Body</td><td>Motorsport Australia</td></tr>
+      <tr><td>Technical Rules</td><td>Group 3E Series Production Cars</td></tr>
+      <tr><td>Drivers per Car</td><td>2-3 drivers required</td></tr>
+      <tr><td>Licence Required</td><td>Motorsport Australia Circuit Licence (NO provisional endorsement)</td></tr>
+      <tr><td>Entry Fee</td><td><strong>$7,535 early bird / $9,955 standard</strong></td></tr>
+      <tr><td>Seat Time</td><td>6 hours racing + practice/qualifying</td></tr>
+      <tr><td>Driver Limits</td><td>Max 3hr continuous, min 1hr rest, max 3.5hr cumulative per driver</td></tr>
+    </table>
+    <div class="note-box warn">Dream event but entry fee is $7,535-$9,955 — well over the $3-5K budget. Also requires NON-provisional licence, so both drivers need experience first. Consider this as a Year 2+ aspirational goal.</div>
+  </div>
+
+  <div class="card">
+    <h3>IPRA Victoria <span class="badge badge-good">Affordable</span></h3>
+    <table>
+      <tr><th style="width:35%">Detail</th><th>Info</th></tr>
+      <tr><td>Format</td><td>Sprint + occasional endurance races at state level</td></tr>
+      <tr><td>Governing Body</td><td>Motorsport Australia</td></tr>
+      <tr><td>Technical Rules</td><td>Group 3J (Improved Production) — more mods allowed than 3E</td></tr>
+      <tr><td>Licence Required</td><td>Motorsport Australia Circuit Licence (~$556/yr)</td></tr>
+      <tr><td>Entry Fee</td><td>~$400-800/round (state level — very affordable)</td></tr>
+      <tr><td>Circuits</td><td>Winton, Phillip Island, Sandown</td></tr>
+      <tr><td>GT86 Class</td><td>Under 2L class (U2L) based on 1998cc engine</td></tr>
+    </table>
+    <div class="note-box">Different technical rules (Group 3J not 3E), so car setup may need adjustment. But a great stepping stone — affordable, local VIC circuits, and builds racing experience. A Group 3E car can run in IPRA with minimal changes.</div>
+  </div>
+
+  <div class="card">
+    <h3>NSW Production Touring Cars <span class="badge badge-good">Option</span></h3>
+    <table>
+      <tr><th style="width:35%">Detail</th><th>Info</th></tr>
+      <tr><td>Format</td><td>Sprint + endurance (including multi-hour enduros)</td></tr>
+      <tr><td>Governing Body</td><td>Motorsport Australia / AASA (varies by event)</td></tr>
+      <tr><td>Circuits</td><td>Sydney Motorsport Park, One Raceway</td></tr>
+      <tr><td>Entry Fee</td><td>~$500-1,500/round</td></tr>
+    </table>
+    <div class="note-box">Good option if travelling to NSW. Toyota 86 has been competitive in Class D at state level. The endurance events (like Pheasant Wood 4hr) are particularly affordable.</div>
+  </div>
+
+  <div class="card">
+    <h3>MSCA Super Sprint (Club Days) <span class="badge badge-good">Practice</span></h3>
+    <table>
+      <tr><th style="width:35%">Detail</th><th>Info</th></tr>
+      <tr><td>Format</td><td>Timed sprint sessions (not wheel-to-wheel racing)</td></tr>
+      <tr><td>Licence Required</td><td>Motorsport Australia Speed Licence or Club membership</td></tr>
+      <tr><td>Entry Fee</td><td>~$200-350/day</td></tr>
+      <tr><td>Circuits</td><td>Phillip Island, Winton, Sandown</td></tr>
+    </table>
+    <div class="note-box">Not racing — but the cheapest way to get track time and practice. Great for shaking down the car and building driver skill before entering competition.</div>
+  </div>
+
+  <div class="card" style="border-color:var(--primary)">
+    <h3>Recommended Strategy</h3>
+    <p style="font-size:0.9rem;margin-bottom:0.5rem"><strong>Phase 1 (Months 1-6):</strong> Build car to Group 3E spec. Get second driver licensed. Run MSCA sprint days for car shakedown and driver practice.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.5rem"><strong>Phase 2 (Months 6-9):</strong> Enter IPRA VIC rounds for affordable state-level racing. Build race experience and get provisional endorsement removed.</p>
+    <p style="font-size:0.9rem;margin-bottom:0.5rem"><strong>Phase 3 (Months 9-12+):</strong> Enter APC Enduro Championship for maximum seat time. This is the main target — 2-3hr endurance races with team branding.</p>
+    <p style="font-size:0.9rem"><strong>Dream Goal (Year 2+):</strong> Bathurst 6 Hour once budget allows and both drivers have non-provisional licences.</p>
+  </div>
+</div>
+
+<!-- ============ BUILD CHECKLIST ============ -->
+<div id="build" class="section">
+  <h2 style="margin:1rem 0 0.8rem;">Build Checklist</h2>
+  <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem">Tap items to mark complete. Progress saves locally in your browser. Each item references the relevant regulation schedule.</p>
+
+  <div class="card">
+    <div class="collapsible-header open" onclick="toggleCollapse(this)">
+      <h3>Safety — Roll Cage & Harness <span class="badge badge-todo" id="badge-safety">0/6</span></h3>
+    </div>
+    <div class="collapsible-body open">
+      <div class="checklist-item" data-group="safety" data-id="cage">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">6-point bolt-in roll cage</div>
+          <div class="item-detail">Roll In Cages — Toyota 86/BRZ specific</div>
+          <div class="item-ref">Schedule J — Rollover protection. Must comply with FIA or Motorsport Australia Schedule J specifications. Minimum 6-point for endurance.</div>
+        </div>
+        <div class="item-price">$2,620</div>
+      </div>
+      <div class="checklist-item" data-group="safety" data-id="seats">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Racetech RT4100HR containment seats (x2)</div>
+          <div class="item-detail">Full containment package with brackets + harnesses</div>
+          <div class="item-ref">Schedule I — FIA-approved seats required. Full containment recommended for endurance. Must have valid FIA homologation label.</div>
+        </div>
+        <div class="item-price">$2,300</div>
+      </div>
+      <div class="checklist-item" data-group="safety" data-id="windownet">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Window net (Schroth)</div>
+          <div class="item-detail">Driver's side window net — SFI or FIA approved</div>
+          <div class="item-ref">Schedule I — Window net mandatory. Must be attached to roll cage and be quickly releasable by driver.</div>
+        </div>
+        <div class="item-price">$660</div>
+      </div>
+      <div class="checklist-item" data-group="safety" data-id="fire">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Plumbed-in fire extinguisher (Lifeline Zero 2020 3.0L)</div>
+          <div class="item-detail">Electrically activated, plumbed into engine bay + cockpit</div>
+          <div class="item-ref">Schedule H — Plumbed-in fire suppression mandatory for APC endurance races. Must be operable by driver and from outside vehicle.</div>
+        </div>
+        <div class="item-price">$1,400</div>
+      </div>
+      <div class="checklist-item" data-group="safety" data-id="killswitch">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Master kill switches (internal + external)</div>
+          <div class="item-detail">Internal operable by driver; external near A-pillar base with marked sticker</div>
+          <div class="item-ref">Schedule C — Battery master switch must isolate all electrical circuits. External switch must be clearly marked with a red spark on blue triangle.</div>
+        </div>
+        <div class="item-price">~$150</div>
+      </div>
+      <div class="checklist-item" data-group="safety" data-id="seatplate">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Seat anchorage counterplates</div>
+          <div class="item-detail">Reinforcement plates per Schedule C drawings for seat mounting</div>
+          <div class="item-ref">Schedule C — Seat mounting points must use counterplates to spread load. See Schedule C drawing for dimensions.</div>
+        </div>
+        <div class="item-price">~$100</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Brakes <span class="badge badge-todo" id="badge-brakes">0/4</span></h3>
+    </div>
+    <div class="collapsible-body">
+      <div class="checklist-item" data-group="brakes" data-id="rotors">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">DBA T3 5000 series 2-piece slotted front rotors</div>
+          <div class="item-detail">Must be within +5mm or -2mm of standard 294mm diameter (292-299mm range)</div>
+          <div class="item-ref">Group 3E Art. 7(c) — Rotors must be ferrous, same diameter within +5/-2mm tolerance. Ventilated if originally ventilated.</div>
+        </div>
+        <div class="item-price">$1,350</div>
+      </div>
+      <div class="checklist-item" data-group="brakes" data-id="brakelines">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Braided stainless steel brake lines (4x)</div>
+          <div class="item-detail">HEL Performance — Toyota 86 GTS / BRZ specific</div>
+          <div class="item-ref">Group 3E Art. 7 — Brake hoses may be replaced with braided stainless lines.</div>
+        </div>
+        <div class="item-price">$250</div>
+      </div>
+      <div class="checklist-item" data-group="brakes" data-id="pads">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Race brake pads (front + rear)</div>
+          <div class="item-detail">Free choice — recommend Winmax or Project Mu for endurance</div>
+          <div class="item-ref">Group 3E Art. 7(b) — Brake pads are free (any manufacturer/compound).</div>
+        </div>
+        <div class="item-price">~$600</div>
+      </div>
+      <div class="checklist-item" data-group="brakes" data-id="ducts">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Brake cooling ducts</div>
+          <div class="item-detail">Max 80mm internal diameter, within 80mm of rotor. Can remove fog lamp/blanking plate for airflow.</div>
+          <div class="item-ref">Group 3E Art. 7 — Brake ducts permitted, max 80mm ID, must terminate within 80mm of rotor.</div>
+        </div>
+        <div class="item-price">~$200</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Suspension <span class="badge badge-todo" id="badge-suspension">0/3</span></h3>
+    </div>
+    <div class="collapsible-body">
+      <div class="checklist-item" data-group="suspension" data-id="coilovers">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">MCA Reds coilovers</div>
+          <div class="item-detail">Full set — adjustable dampers with springs</div>
+          <div class="item-ref">Group 3E Art. 6(a)-(b) — Springs: free, must be ferrous helical. Dampers: free replacement, must use same mounting points (+/-25mm). No air/electronic adjustment from cockpit.</div>
+        </div>
+        <div class="item-price">$4,000</div>
+      </div>
+      <div class="checklist-item" data-group="suspension" data-id="bushes">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Polyurethane/uniball bush kit (full set)</div>
+          <div class="item-detail">All rubber bushes can be replaced with elastomer (polyurethane) or uniball type</div>
+          <div class="item-ref">Group 3E Art. 6(e) — Suspension bushes may be replaced with elastomer of any specification. Spherical bearings permitted where original is elastomer.</div>
+        </div>
+        <div class="item-price">~$800</div>
+      </div>
+      <div class="checklist-item" data-group="suspension" data-id="wheelstud">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">ARP extended wheel studs</div>
+          <div class="item-detail">86/BRZ specific kit</div>
+          <div class="item-ref">Stronger than factory — recommended for endurance reliability.</div>
+        </div>
+        <div class="item-price">$80</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Cooling & Engine <span class="badge badge-todo" id="badge-cooling">0/3</span></h3>
+    </div>
+    <div class="collapsible-body">
+      <div class="checklist-item" data-group="cooling" data-id="radiator">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Koyorad aluminium racing radiator</div>
+          <div class="item-detail">Direct-fit replacement for 86/BRZ</div>
+          <div class="item-ref">Group 3E Art. 3(l) — Radiator replacement permitted provided it fits within standard location.</div>
+        </div>
+        <div class="item-price">$650</div>
+      </div>
+      <div class="checklist-item" data-group="cooling" data-id="oilcooler">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">HEL direct-fit oil cooler kit</div>
+          <div class="item-detail">Essential for endurance — FA20 runs hot under sustained load</div>
+          <div class="item-ref">Group 3E Art. 3(m) — Oil cooler addition permitted.</div>
+        </div>
+        <div class="item-price">$1,000</div>
+      </div>
+      <div class="checklist-item" data-group="cooling" data-id="ecu">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Aftermarket ECU or tune</div>
+          <div class="item-detail">ECU is free — can use custom ECU but all OEM sensors must remain. Consider EcuTek or Link for 3E compliance.</div>
+          <div class="item-ref">Group 3E Art. 9 — ECU and associated wiring free. All OEM sensors must be retained. Data logging permitted.</div>
+        </div>
+        <div class="item-price">~$1,500</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Fuel System <span class="badge badge-todo" id="badge-fuel">0/2</span></h3>
+    </div>
+    <div class="collapsible-body">
+      <div class="checklist-item" data-group="fuel" data-id="fueltank">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Additional 20L fuel tank or FIA fuel cell</div>
+          <div class="item-detail">GT86 standard is 50L. Group 3E allows max 80L for 2001-3000cc class. Can add 20L tank in boot area, or replace with FIA FT3-1999 cell.</div>
+          <div class="item-ref">Group 3E Art. 5 — Max fuel capacity 80L (1501-2000cc = 60L, 2001-3000cc = 80L). FIA FT3-1999 or FT3.5 cell permitted. Note: 86 is 1998cc so falls in 60L max class — check this carefully.</div>
+        </div>
+        <div class="item-price">~$1,500</div>
+      </div>
+      <div class="checklist-item" data-group="fuel" data-id="drybreak">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Dry-break refuelling system</div>
+          <div class="item-detail">Mandatory for APC endurance races. Overhead refuelling rig also required (can be shared/rented).</div>
+          <div class="item-ref">APC Regs S14 — Dry-break refuelling mandatory. Must comply with FIA or Motorsport Australia approved system. Overhead rig required.</div>
+        </div>
+        <div class="item-price">~$1,200</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Electronics & Data <span class="badge badge-todo" id="badge-electronics">0/3</span></h3>
+    </div>
+    <div class="collapsible-body">
+      <div class="checklist-item" data-group="electronics" data-id="laptimer">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">AIM Solo 2 DL GPS lap timer</div>
+          <div class="item-detail">Data logging with GPS — excellent for driver development</div>
+          <div class="item-ref">Group 3E Art. 9 — Data logging equipment permitted.</div>
+        </div>
+        <div class="item-price">$1,319</div>
+      </div>
+      <div class="checklist-item" data-group="electronics" data-id="camera">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Judicial camera (HD 1080p)</div>
+          <div class="item-detail">Forward-facing, must show driver hands on wheel. Minimum 5x 8GB SD cards required.</div>
+          <div class="item-ref">APC Regs S22 — HD 1080p judicial camera mandatory. Must record all sessions. SD cards must be labelled with car number. Camera tethered per AASA regs.</div>
+        </div>
+        <div class="item-price">~$300</div>
+      </div>
+      <div class="checklist-item" data-group="electronics" data-id="rainlight">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">72 LED rain light (FIA approved)</div>
+          <div class="item-detail">Must be switchable by driver from cockpit</div>
+          <div class="item-ref">Schedule C — Rear rain light mandatory. Must be operable from cockpit.</div>
+        </div>
+        <div class="item-price">$140</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Interior & Bodywork <span class="badge badge-todo" id="badge-interior">0/5</span></h3>
+    </div>
+    <div class="collapsible-body">
+      <div class="checklist-item" data-group="interior" data-id="strip">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Interior strip (allowable items)</div>
+          <div class="item-detail">Remove: roof padding, carpet, insulation, sound deadening, rear seats, front passenger seat, SRS/airbag system, boot lining, spare wheel, entertainment system + wiring. RETAIN: dashboard, glove box, centre console, steering column/covers, instrument cluster, door trim.</div>
+          <div class="item-ref">Group 3E Art. 8 — Specific items removable. Dashboard must retain; holes from removed components must be filled. Door trim must be maintained (can substitute material).</div>
+        </div>
+        <div class="item-price">DIY</div>
+      </div>
+      <div class="checklist-item" data-group="interior" data-id="rearwindow">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Polycarbonate rear window</div>
+          <div class="item-detail">Rear window can be replaced with polycarbonate. Front door glass must remain OEM.</div>
+          <div class="item-ref">Group 3E Art. 8(j) — Rear windscreen may be replaced with polycarbonate (min 3mm). Side and front windscreen must remain glass.</div>
+        </div>
+        <div class="item-price">~$300</div>
+      </div>
+      <div class="checklist-item" data-group="interior" data-id="hoodpins">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Bonnet & boot lock pins</div>
+          <div class="item-detail">Secondary retention pins for bonnet and boot lid</div>
+          <div class="item-ref">Schedule C — Additional bonnet/boot retention required.</div>
+        </div>
+        <div class="item-price">~$80</div>
+      </div>
+      <div class="checklist-item" data-group="interior" data-id="towhook">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Tow hooks (front + rear)</div>
+          <div class="item-detail">Must be visible and accessible from outside vehicle</div>
+          <div class="item-ref">Schedule C — Recovery hooks front and rear mandatory.</div>
+        </div>
+        <div class="item-price">~$100</div>
+      </div>
+      <div class="checklist-item" data-group="interior" data-id="pitlimit">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Pit speed limiter switch</div>
+          <div class="item-detail">Enable a switch to engage pit lane speed limit</div>
+          <div class="item-ref">APC/race series requirement — Pit lane speed limit must be electronically controllable.</div>
+        </div>
+        <div class="item-price">~$100</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Driver Gear <span class="badge badge-todo" id="badge-gear">0/2</span></h3>
+    </div>
+    <div class="collapsible-body">
+      <div class="checklist-item" data-group="gear" data-id="helmetT">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Driver 1 (Terence) — Helmet + race suit + gear</div>
+          <div class="item-detail">FIA-approved helmet (SA2020 or newer), race suit, underwear, balaclava, gloves, socks, boots</div>
+          <div class="item-ref">Schedule D — All driver apparel must meet FIA or SFI standards. Helmet SA2015 or newer required.</div>
+        </div>
+        <div class="item-price">~$2,000</div>
+      </div>
+      <div class="checklist-item" data-group="gear" data-id="helmetW">
+        <input type="checkbox" onchange="toggleCheck(this)">
+        <div class="item-text">
+          <div class="item-title">Driver 2 (Wayne) — Helmet + race suit + gear</div>
+          <div class="item-detail">FIA-approved helmet (SA2020 or newer), race suit, underwear, balaclava, gloves, socks, boots</div>
+          <div class="item-ref">Schedule D — Both drivers need their own approved equipment.</div>
+        </div>
+        <div class="item-price">~$2,000</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PARTS LIST ============ -->
+<div id="parts" class="section">
+  <h2 style="margin:1rem 0 0.8rem;">Parts List & Budget</h2>
+  <div class="card">
+    <table>
+      <tr><th>Part</th><th>Sched.</th><th style="text-align:right">Price</th><th>Link</th></tr>
+      <tr><td>Roll cage (6pt bolt-in)</td><td>J</td><td style="text-align:right">$2,620</td><td><a href="https://rollincages.com.au/product/toyota-86-brz-6-point-cage/" target="_blank">Buy</a></td></tr>
+      <tr><td>Racetech seats + harness</td><td>I</td><td style="text-align:right">$2,300</td><td><a href="https://racetechseats.com.au/shop/racing-seats/RT4100HR-full-containment-package" target="_blank">Buy</a></td></tr>
+      <tr><td>Window net (Schroth)</td><td>I</td><td style="text-align:right">$660</td><td><a href="https://www.velo.com.au/schroth-window-net" target="_blank">Buy</a></td></tr>
+      <tr><td>Fire extinguisher (Lifeline)</td><td>H</td><td style="text-align:right">$1,400</td><td><a href="https://www.racerindustries.com.au/lifeline-zero-2020-3.0l-electrical-complete-kit" target="_blank">Buy</a></td></tr>
+      <tr><td>MCA Reds coilovers</td><td>—</td><td style="text-align:right">$4,000</td><td><a href="https://mcasuspension.com/mca-reds-toyota-86-all/" target="_blank">Buy</a></td></tr>
+      <tr><td>DBA T3 front rotors</td><td>—</td><td style="text-align:right">$1,350</td><td><a href="https://www.prospeedracing.com.au/products/dba-t3-5000-series-2-piece-slotted-front-rotors-pair-wrx-forester-brz-toyota-86-gts-dba5010blks" target="_blank">Buy</a></td></tr>
+      <tr><td>HEL braided brake lines</td><td>—</td><td style="text-align:right">$250</td><td><a href="https://www.braided-lines.com.au/products/hel-performance-braided-brake-line-kit-toyota-86-gts-subaru-brz" target="_blank">Buy</a></td></tr>
+      <tr><td>AIM Solo 2 DL lap timer</td><td>—</td><td style="text-align:right">$1,319</td><td><a href="https://superbikesupply.com.au/products/aim-solo-2-dl-gps-lap-timer-free-delivery" target="_blank">Buy</a></td></tr>
+      <tr><td>HEL oil cooler kit</td><td>—</td><td style="text-align:right">$1,000</td><td><a href="https://www.braided-lines.com.au/products/hel-direct-fit-oil-cooler-kit-for-toyota-gt86" target="_blank">Buy</a></td></tr>
+      <tr><td>Koyorad racing radiator</td><td>—</td><td style="text-align:right">$650</td><td><a href="https://www.racedivision.com.au/products/koyorad-aluminium-racing-radiator-86-brz" target="_blank">Buy</a></td></tr>
+      <tr><td>72 LED rain light (FIA)</td><td>C</td><td style="text-align:right">$140</td><td><a href="https://revolutionracegear.com.au/product/72-led-rain-light-fia/" target="_blank">Buy</a></td></tr>
+      <tr><td>ARP wheel studs</td><td>—</td><td style="text-align:right">$80</td><td><a href="https://the86shop.com.au/products/arp-wheel-stud-kit-86-brz" target="_blank">Buy</a></td></tr>
+      <tr style="border-top:2px solid var(--border)"><td colspan="2"><strong>Subtotal (priced items)</strong></td><td style="text-align:right"><strong>$15,769</strong></td><td></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h3>Additional Items (estimate)</h3>
+    <table>
+      <tr><th>Part</th><th>Est. Price</th><th>Notes</th></tr>
+      <tr><td>Race brake pads (F+R)</td><td>~$600</td><td>Free choice under 3E rules</td></tr>
+      <tr><td>Brake cooling ducts</td><td>~$200</td><td>Max 80mm ID</td></tr>
+      <tr><td>Suspension bushes (full set)</td><td>~$800</td><td>Uniball/poly allowed</td></tr>
+      <tr><td>Kill switches (int + ext)</td><td>~$150</td><td>Schedule C mandatory</td></tr>
+      <tr><td>Seat counterplates</td><td>~$100</td><td>Schedule C requirement</td></tr>
+      <tr><td>Tow hooks (F+R)</td><td>~$100</td><td>Schedule C mandatory</td></tr>
+      <tr><td>Bonnet/boot pins</td><td>~$80</td><td>Schedule C mandatory</td></tr>
+      <tr><td>Polycarbonate rear window</td><td>~$300</td><td>Optional weight saving</td></tr>
+      <tr><td>Pit speed limiter switch</td><td>~$100</td><td>Required for racing</td></tr>
+      <tr><td>Judicial camera (HD)</td><td>~$300</td><td>APC mandatory</td></tr>
+      <tr><td>ECU tune / aftermarket ECU</td><td>~$1,500</td><td>Free under 3E (OEM sensors retained)</td></tr>
+      <tr><td>Fuel cell / extra tank + dry-break</td><td>~$2,700</td><td>Fuel system for endurance</td></tr>
+      <tr><td>Driver gear x2 (helmets, suits, etc.)</td><td>~$4,000</td><td>Schedule D — both drivers</td></tr>
+      <tr style="border-top:2px solid var(--border)"><td><strong>Additional est.</strong></td><td><strong>~$10,930</strong></td><td></td></tr>
+    </table>
+  </div>
+
+  <div class="total-bar">
+    Estimated Total Build Budget: <span class="amount">~$26,700 AUD</span>
+    <div style="font-size:0.8rem;color:var(--text-dim);font-weight:400;margin-top:4px">Excludes entry fees, tyres, consumables, fuel, and running costs</div>
+  </div>
+</div>
+
+<!-- ============ RULES QUICK-REF ============ -->
+<div id="rules" class="section">
+  <h2 style="margin:1rem 0 0.8rem;">Group 3E Rules Quick Reference</h2>
+  <p style="font-size:0.85rem;color:var(--text-dim);margin-bottom:1rem">Key modifications allowed under Group 3E Series Production Cars regulations. Always check the full regulation document for complete details.</p>
+
+  <div class="card">
+    <div class="collapsible-header open" onclick="toggleCollapse(this)">
+      <h3>Engine (Art. 3)</h3>
+    </div>
+    <div class="collapsible-body open">
+      <dl class="spec-grid">
+        <dt>Bore</dt><dd>+0.6mm max (86.6mm for 86)</dd>
+        <dt>Con rods</dt><dd>Replaceable, must be ferrous</dd>
+        <dt>Pistons</dt><dd>Replaceable, same weight ±5% & shape</dd>
+        <dt>Camshaft timing</dt><dd>Free</dd>
+        <dt>Exhaust (NA)</dt><dd>Free from head (full system)</dd>
+        <dt>Supercharging</dt><dd>Not permitted (NA only for 86)</dd>
+        <dt>Intake manifold</dt><dd>Must remain standard</dd>
+        <dt>Engine mounts</dt><dd>Free, same position</dd>
+        <dt>Oil cooler</dt><dd>Addition permitted</dd>
+        <dt>Radiator</dt><dd>Replacement permitted</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Transmission (Art. 4)</h3>
+    </div>
+    <div class="collapsible-body">
+      <dl class="spec-grid">
+        <dt>Gearbox internals</dt><dd>Shift fork, hub key, bushing free</dd>
+        <dt>Gear ratios</dt><dd>Must remain standard</dd>
+        <dt>Flywheel</dt><dd>Free — must be ferrous material</dd>
+        <dt>Clutch</dt><dd>Free — same # driven plates, diaphragm type</dd>
+        <dt>Diff ratio</dt><dd>Must remain standard (4.100)</dd>
+        <dt>Diff type</dt><dd>Can be modified but ratio standard</dd>
+        <dt>Gearbox mounts</dt><dd>Free, same position</dd>
+        <dt>Prop shaft</dt><dd>Must not contact ground if failed</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Suspension (Art. 6)</h3>
+    </div>
+    <div class="collapsible-body">
+      <dl class="spec-grid">
+        <dt>Springs</dt><dd>Free, must be ferrous helical</dd>
+        <dt>Dampers</dt><dd>Free replacement</dd>
+        <dt>Mounting points</dt><dd>±25mm from standard</dd>
+        <dt>Bushes</dt><dd>Elastomer free (poly/uniball OK)</dd>
+        <dt>Anti-roll bars</dt><dd>Free replacement or removal</dd>
+        <dt>Ride height</dt><dd>Min 100mm with driver at any point (except exhaust)</dd>
+        <dt>Camber/toe</dt><dd>Free via allowed adjustments</dd>
+        <dt>Cockpit adjustment</dt><dd>No air/electronic from cockpit</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Brakes (Art. 7)</h3>
+    </div>
+    <div class="collapsible-body">
+      <dl class="spec-grid">
+        <dt>Brake pads</dt><dd>Free (any compound)</dd>
+        <dt>Rotors</dt><dd>Ferrous, +5mm/-2mm of standard diameter</dd>
+        <dt>Front calipers</dt><dd>Up to 6-piston max</dd>
+        <dt>Rear calipers</dt><dd>Up to 4-piston max</dd>
+        <dt>Calipers per wheel</dt><dd>1 only (adapter bracket OK)</dd>
+        <dt>Master cylinder</dt><dd>Free replacement</dd>
+        <dt>Prop valve</dt><dd>Cannot be adjustable from cockpit</dd>
+        <dt>ABS</dt><dd>Can be disabled</dd>
+        <dt>Vacuum booster</dt><dd>Can be removed</dd>
+        <dt>Dust shields</dt><dd>Can remove for cooling ducts</dd>
+        <dt>Brake ducts</dt><dd>Max 80mm ID, within 80mm of rotor</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Electronics (Art. 9)</h3>
+    </div>
+    <div class="collapsible-body">
+      <dl class="spec-grid">
+        <dt>ECU</dt><dd>Free (custom ECU allowed)</dd>
+        <dt>Sensors</dt><dd>All OEM sensors must remain</dd>
+        <dt>Wiring</dt><dd>Free</dd>
+        <dt>Data logging</dt><dd>Permitted</dd>
+        <dt>Battery</dt><dd>Can relocate to cockpit</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Interior & Bodywork (Art. 8)</h3>
+    </div>
+    <div class="collapsible-body">
+      <dl class="spec-grid">
+        <dt>Removable</dt><dd>Carpet, insulation, sound deadening, rear seats, passenger seat, SRS, boot lining, spare wheel, stereo</dd>
+        <dt>Must retain</dt><dd>Dashboard, glove box, centre console, steering column, instrument cluster, door trim</dd>
+        <dt>Rear window</dt><dd>Polycarbonate OK (min 3mm)</dd>
+        <dt>Front door glass</dt><dd>Must remain OEM</dd>
+        <dt>Bonnet/boot</dt><dd>Extra lock pins required</dd>
+        <dt>Aero</dt><dd>See Schedule F (optional)</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="collapsible-header" onclick="toggleCollapse(this)">
+      <h3>Fuel System (Art. 5)</h3>
+    </div>
+    <div class="collapsible-body">
+      <dl class="spec-grid">
+        <dt>Max capacity (1998cc)</dt><dd>60L (1501-2000cc class)</dd>
+        <dt>Fuel cell</dt><dd>FIA FT3-1999 or FT3.5 permitted</dd>
+        <dt>Dry-break</dt><dd>Mandatory for endurance</dd>
+        <dt>Standard tank</dt><dd>50L — 10L additional possible</dd>
+      </dl>
+      <div class="note-box warn">The 86 has a 1998cc engine, placing it in the 1501-2000cc fuel class with a 60L max. You can add 10L to the standard 50L tank. Check regulations carefully — some interpretations may class the corrected capacity (86x86=1998cc) differently.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ LICENCES ============ -->
+<div id="licence" class="section">
+  <h2 style="margin:1rem 0 0.8rem;">Licence Pathway</h2>
+
+  <div class="card">
+    <h3>Driver 1 — Has Existing Licence</h3>
+    <div class="note-box success">One driver already holds a competition licence. Verify it covers Circuit Race discipline and check if it's a Motorsport Australia or AASA licence. For APC, you'll need an AASA National Racing Licence ($570/yr). For TGRA/Bathurst, you'll need a Motorsport Australia Circuit Licence ($556/yr).</div>
+    <p style="font-size:0.85rem;margin-top:0.5rem;color:var(--text-dim)">If holding a Motorsport Australia licence with provisional endorsement: Bathurst 6 Hour is NOT eligible (no provisional allowed at Mt Panorama). APC under AASA may have different rules — confirm with AASA.</p>
+  </div>
+
+  <div class="card">
+    <h3>Driver 2 — Needs New Licence</h3>
+    <p style="font-size:0.9rem;margin-bottom:0.8rem">Here's the pathway to get race-licensed:</p>
+
+    <div class="timeline-item future">
+      <div class="tl-date">Step 1</div>
+      <div class="tl-title">Medical Examination</div>
+      <div class="tl-desc">Visit a doctor for Motorsport Australia Medical Standards assessment. Required before licence application.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Step 2</div>
+      <div class="tl-title">Join a Motorsport Australia-affiliated club</div>
+      <div class="tl-desc">Must be a member of an affiliated car club (not just an Enthusiast Club). Examples: ARDC, IPRA VIC, local car racing club.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Step 3</div>
+      <div class="tl-title">Pre-Licence Lecture</div>
+      <div class="tl-desc">Complete the Motorsport Australia Circuit Race Licence Lecture (available online). Must be completed before OLT.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Step 4</div>
+      <div class="tl-title">Observed Licence Test (OLT)</div>
+      <div class="tl-desc">On-track assessment by approved OLT provider. Driving style, ability, and attitude evaluated. Must be completed within 1 year of the lecture. Costs vary (~$300-600).</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Step 5</div>
+      <div class="tl-title">Licence Issued — Circuit with Provisional Endorsement</div>
+      <div class="tl-desc">Initial licence comes with Provisional endorsement (P-plate displayed on car). Cost: ~$556/yr for Motorsport Australia. Min age: 15 for Toyota 86 (16 at Bathurst).</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Step 6 (upgrade)</div>
+      <div class="tl-title">Remove Provisional Endorsement</div>
+      <div class="tl-desc">Compete to the satisfaction of Clerk of Course at 3 Motorsport Australia Circuit Race Events in the previous 24 months. Passbook signed by Clerk of Course.</div>
+    </div>
+
+    <div class="note-box" style="margin-top:1rem">
+      <strong>For AASA licence (APC):</strong> Separate application at aasa.com.au. National Racing Licence costs ~$570/yr. Different pathway but similar concept. Check if AASA accepts Motorsport Australia licence holders.
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Licence Summary</h3>
+    <table>
+      <tr><th>Licence</th><th>Body</th><th>Cost</th><th>Needed For</th></tr>
+      <tr><td>Circuit (Provisional)</td><td>Motorsport Aus</td><td>~$556/yr</td><td>TGRA, IPRA, state races, Bathurst (after upgrade)</td></tr>
+      <tr><td>National Racing</td><td>AASA</td><td>~$570/yr</td><td>APC Endurance Championship</td></tr>
+      <tr><td>Club membership</td><td>Various</td><td>~$50-150/yr</td><td>Required to hold MA licence</td></tr>
+      <tr><td>Medical</td><td>Doctor</td><td>~$80-150</td><td>Required for all licence types</td></tr>
+      <tr><td>OLT (new drivers)</td><td>Provider</td><td>~$300-600</td><td>Required for new Motorsport Aus licence</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============ CAR SPECS ============ -->
+<div id="specs" class="section">
+  <h2 style="margin:1rem 0 0.8rem;">Toyota 86 GTS — Recognition Document 3-13-009</h2>
+
+  <div class="card">
+    <h3>General</h3>
+    <dl class="spec-grid">
+      <dt>Manufacturer</dt><dd>Fuji Heavy Industries</dd>
+      <dt>Model</dt><dd>Toyota 86</dd>
+      <dt>Engine capacity</dt><dd>1998cc (86x86mm)</dd>
+      <dt>Construction</dt><dd>Monocoque, Steel</dd>
+      <dt>Seats (standard)</dt><dd>4</dd>
+      <dt>Min Racing Weight</dt><dd>1214 kg</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>Dimensions</h3>
+    <dl class="spec-grid">
+      <dt>Length</dt><dd>4240mm</dd>
+      <dt>Width (body)</dt><dd>1775mm</dd>
+      <dt>Width (mirrors)</dt><dd>1980mm</dd>
+      <dt>Wheelbase</dt><dd>2570mm</dd>
+      <dt>Front track</dt><dd>1520mm</dd>
+      <dt>Rear track</dt><dd>1540mm</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>Engine</h3>
+    <dl class="spec-grid">
+      <dt>Layout</dt><dd>4-cyl Horizontal (Boxer)</dd>
+      <dt>Position</dt><dd>Front, North-South</dd>
+      <dt>Bore x Stroke</dt><dd>86 x 86mm</dd>
+      <dt>Compression</dt><dd>12.5:1</dd>
+      <dt>Block</dt><dd>Aluminium alloy, cast iron sleeves (dry)</dd>
+      <dt>Heads</dt><dd>Alloy, DOHC, 4 camshafts (chain)</dd>
+      <dt>Valves</dt><dd>4 per cylinder (16 total)</dd>
+      <dt>Intake manifold</dt><dd>Plastic, 1 element</dd>
+      <dt>Exhaust manifold</dt><dd>Stainless steel, 1 element</dd>
+      <dt>Ignition</dt><dd>Electronic, 4 coils</dd>
+      <dt>Fuel injection</dt><dd>Manifold + Cylinder head (D4S)</dd>
+      <dt>Supercharging</dt><dd>No</dd>
+      <dt>Oil capacity</dt><dd>5.4L with filter</dd>
+      <dt>Cooling capacity</dt><dd>7.2L</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>Transmission</h3>
+    <dl class="spec-grid">
+      <dt>Gearbox</dt><dd>TL701VD90A, 6-speed manual</dd>
+      <dt>1st gear</dt><dd>3.626</dd>
+      <dt>2nd gear</dt><dd>2.188</dd>
+      <dt>3rd gear</dt><dd>1.541</dd>
+      <dt>4th gear</dt><dd>1.213</dd>
+      <dt>5th gear</dt><dd>1.000</dd>
+      <dt>6th gear</dt><dd>0.767</dd>
+      <dt>Reverse</dt><dd>3.437</dd>
+      <dt>Final drive</dt><dd>4.100 (Torsen LSD)</dd>
+      <dt>Driven wheels</dt><dd>Rear</dd>
+      <dt>Clutch</dt><dd>Dry single plate diaphragm</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>Suspension</h3>
+    <dl class="spec-grid">
+      <dt>Front type</dt><dd>MacPherson Strut</dd>
+      <dt>Rear type</dt><dd>Double Wishbone</dd>
+      <dt>Springs</dt><dd>Helical, High Tensile Steel</dd>
+      <dt>Dampers</dt><dd>Gas/Oil (1 per wheel)</dd>
+      <dt>Front sway bar</dt><dd>18mm Steel</dd>
+      <dt>Rear sway bar</dt><dd>14mm Steel</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>Brakes</h3>
+    <dl class="spec-grid">
+      <dt>Front</dt><dd>Ventilated disc, 294mm, 2-piston floating (aluminium)</dd>
+      <dt>Rear</dt><dd>Ventilated disc, 290mm, 1-piston floating (aluminium)</dd>
+      <dt>Disc thickness (F)</dt><dd>24mm</dd>
+      <dt>Disc thickness (R)</dt><dd>18mm</dd>
+      <dt>Master cylinder</dt><dd>1x (Hitachi 10.5")</dd>
+      <dt>Parking brake</dt><dd>Duo servo drum in rear disc</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>Wheels</h3>
+    <dl class="spec-grid">
+      <dt>Diameter</dt><dd>17"</dd>
+      <dt>Width</dt><dd>7.0"</dd>
+      <dt>Offset</dt><dd>+48mm</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>Bodywork</h3>
+    <dl class="spec-grid">
+      <dt>Doors</dt><dd>2 + tailgate</dd>
+      <dt>Door material</dt><dd>Anti-corrosion sheet steel</dd>
+      <dt>Bonnet</dt><dd>Aluminium</dd>
+      <dt>Roof/body</dt><dd>Anti-corrosion sheet steel</dd>
+      <dt>Bumpers</dt><dd>Plastic</dd>
+      <dt>Steering</dt><dd>Rack and pinion, electric assist</dd>
+    </dl>
+  </div>
+</div>
+
+<!-- ============ TIMELINE ============ -->
+<div id="timeline" class="section">
+  <h2 style="margin:1rem 0 0.8rem;">Build Timeline (6-12 Months)</h2>
+
+  <div class="card">
+    <h3>Phase 1 — Safety & Compliance (Months 1-3)</h3>
+    <div class="timeline-item done">
+      <div class="tl-date">Completed</div>
+      <div class="tl-title">Engine swap + drivetrain upgrades</div>
+      <div class="tl-desc">Secondhand engine, Xtreme flywheel + clutch, Verus fork + pivot ball, throwout bearing</div>
+    </div>
+    <div class="timeline-item current">
+      <div class="tl-date">Month 1-2</div>
+      <div class="tl-title">Roll cage installation</div>
+      <div class="tl-desc">6-point bolt-in cage. Must be fitted before seats/harness. Professional fit recommended.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 2</div>
+      <div class="tl-title">Seats, harness & window net</div>
+      <div class="tl-desc">Racetech containment seats with counterplates. Harness mounted to cage/chassis. Window net fitted.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 2-3</div>
+      <div class="tl-title">Fire extinguisher + kill switches</div>
+      <div class="tl-desc">Plumbed-in fire system. Internal + external kill switch. Wiring for rain light.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 3</div>
+      <div class="tl-title">Interior strip</div>
+      <div class="tl-desc">Remove allowable items. Fill any dashboard holes. Retain required components.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Phase 2 — Performance & Reliability (Months 3-6)</h3>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 3-4</div>
+      <div class="tl-title">Suspension (MCA Reds)</div>
+      <div class="tl-desc">Coilovers, bushes, wheel studs, alignment</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 4</div>
+      <div class="tl-title">Brakes</div>
+      <div class="tl-desc">DBA rotors, braided lines, race pads, cooling ducts</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 4-5</div>
+      <div class="tl-title">Cooling upgrades</div>
+      <div class="tl-desc">Koyorad radiator, HEL oil cooler — essential for endurance reliability</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 5-6</div>
+      <div class="tl-title">ECU & electronics</div>
+      <div class="tl-desc">ECU tune, pit limiter switch, data logging, judicial camera install</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Phase 3 — Race Preparation (Months 6-9)</h3>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 6-7</div>
+      <div class="tl-title">Fuel system (for endurance)</div>
+      <div class="tl-desc">Additional fuel capacity, dry-break refuelling system</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 7</div>
+      <div class="tl-title">Livery & signage</div>
+      <div class="tl-desc">Ringwood Service Centre branding, race numbers, required series sponsor areas</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 7-8</div>
+      <div class="tl-title">Shakedown days (MSCA sprints)</div>
+      <div class="tl-desc">Track test at Winton/Phillip Island. Check all systems under load.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 8-9</div>
+      <div class="tl-title">Driver 2 licence obtained</div>
+      <div class="tl-desc">Complete medical, pre-licence lecture, OLT, and receive circuit licence</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Phase 4 — Race Season (Months 9-12+)</h3>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 9-10</div>
+      <div class="tl-title">First race — IPRA VIC or state-level event</div>
+      <div class="tl-desc">Affordable entry, local circuits. Build race experience.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Month 10-12+</div>
+      <div class="tl-title">APC Enduro Championship entry</div>
+      <div class="tl-desc">2-3hr endurance races. Maximum seat time. Team branding showcased.</div>
+    </div>
+    <div class="timeline-item future">
+      <div class="tl-date">Year 2+</div>
+      <div class="tl-title">Bathurst 6 Hour (aspirational)</div>
+      <div class="tl-desc">Once both drivers have non-provisional licences and budget allows.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<footer>
+  <strong style="color:var(--primary)">RINGWOOD SERVICE CENTRE</strong><br>
+  Factory 3/7 Elliot Place, Ringwood VIC 3134<br><br>
+  GT86 Race Build Project — Terence & Wayne<br>
+  Last updated: April 2026
+</footer>
+
+<script>
+// Tab navigation
+function showTab(tabId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// Collapsible sections
+function toggleCollapse(el) {
+  el.classList.toggle('open');
+  const body = el.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+// Checklist
+function toggleCheck(checkbox) {
+  const item = checkbox.closest('.checklist-item');
+  item.classList.toggle('checked', checkbox.checked);
+  saveState();
+  updateProgress();
+  updateGroupBadges();
+}
+
+// Save/load state
+function saveState() {
+  const state = {};
+  document.querySelectorAll('.checklist-item[data-id]').forEach(item => {
+    const cb = item.querySelector('input[type="checkbox"]');
+    if (cb && !cb.disabled) {
+      state[item.dataset.group + '-' + item.dataset.id] = cb.checked;
+    }
+  });
+  try { localStorage.setItem('gt86-build-state', JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const state = JSON.parse(localStorage.getItem('gt86-build-state') || '{}');
+    document.querySelectorAll('.checklist-item[data-id]').forEach(item => {
+      const key = item.dataset.group + '-' + item.dataset.id;
+      const cb = item.querySelector('input[type="checkbox"]');
+      if (cb && !cb.disabled && state[key]) {
+        cb.checked = true;
+        item.classList.add('checked');
+      }
+    });
+  } catch(e) {}
+}
+
+function updateProgress() {
+  const allItems = document.querySelectorAll('.checklist-item[data-id]');
+  const checkedItems = document.querySelectorAll('.checklist-item[data-id].checked');
+  const completed = checkedItems.length + 2; // +2 for already-done items
+  const total = allItems.length + 2;
+  const pct = Math.round((completed / total) * 100);
+
+  const fill = document.getElementById('progressFill');
+  const label = document.getElementById('progressLabel');
+  const countEl = document.getElementById('completedCount');
+  const totalEl = document.getElementById('totalCount');
+
+  if (fill) fill.style.width = pct + '%';
+  if (label) label.textContent = completed + ' of ' + total + ' tasks complete (' + pct + '%)';
+  if (countEl) countEl.textContent = completed;
+  if (totalEl) totalEl.textContent = total;
+}
+
+function updateGroupBadges() {
+  const groups = ['safety','brakes','suspension','cooling','fuel','electronics','interior','gear'];
+  groups.forEach(g => {
+    const items = document.querySelectorAll(`.checklist-item[data-group="${g}"]`);
+    const checked = document.querySelectorAll(`.checklist-item[data-group="${g}"].checked`);
+    const badge = document.getElementById('badge-' + g);
+    if (badge) {
+      badge.textContent = checked.length + '/' + items.length;
+      if (checked.length === items.length && items.length > 0) {
+        badge.className = 'badge badge-done';
+      } else if (checked.length > 0) {
+        badge.className = 'badge badge-inprog';
+      } else {
+        badge.className = 'badge badge-todo';
+      }
+    }
+  });
+}
+
+// Calculate spent
+function updateSpent() {
+  let spent = 0;
+  document.querySelectorAll('.checklist-item[data-id].checked .item-price').forEach(el => {
+    const val = parseFloat(el.textContent.replace(/[^0-9.]/g, ''));
+    if (!isNaN(val)) spent += val;
+  });
+  const el = document.getElementById('spentAmount');
+  if (el) el.textContent = '$' + (spent > 999 ? (spent/1000).toFixed(1) + 'K' : spent);
+}
+
+// Init
+loadState();
+updateProgress();
+updateGroupBadges();
+updateSpent();
+
+// Also update spent when checkboxes change
+document.querySelectorAll('.checklist-item input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('change', updateSpent);
+});
+</script>
+</body>
+</html>
